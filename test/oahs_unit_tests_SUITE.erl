@@ -1,6 +1,5 @@
 -module(oahs_unit_tests_SUITE).
 
--include_lib("common_test/include/ct.hrl").
 -include_lib("stdlib/include/assert.hrl").
 
 -export([all/0]).

@@ -70,17 +70,17 @@ add_internal(#oahs{array = Array, used = Used}, Value) ->
             #oahs{array = Array, used = Used}
     end.
 
-rehash(#oahs{array = OldArray}, #oahs{array = NewArray, used = NewUsed}, Slot) ->
+rehash(#oahs{array = OldArray, used = OldUsed}, #oahs{array = NewArray, used = NewUsed}, Slot) ->
     case Slot == array:size(OldArray) of
         true ->
             NewArray;
         _ ->
             DefaultValue = array:default(OldArray),
             rehash(
-                OldArray,
+                #oahs{array = OldArray, used = OldUsed},
                 case array:get(Slot, OldArray) of
                     DefaultValue ->
-                        NewArray;
+                        #oahs{array = NewArray, used = NewUsed};
                     Value ->
                         add_internal(#oahs{array = NewArray, used = NewUsed}, Value)
                 end,
@@ -96,11 +96,8 @@ grow(#oahs{array = Array, used = Used}) ->
             case (Used / array:size(Array)) > ?LOAD_FACTOR of
                 true ->
                     rehash(
-                        Array,
-                        array:new([
-                            {size, array:size(Array) * ?GROW_FACTOR},
-                            {fixed, true}
-                        ])
+                        #oahs{array = Array, used = Used},
+                        new(array:size(Array) * ?GROW_FACTOR)
                     );
                 _ ->
                     Array
