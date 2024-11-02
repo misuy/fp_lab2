@@ -1,0 +1,4 @@
+.vscode
+*.beam
+_build
+rebar.lock
