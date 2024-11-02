@@ -20,7 +20,7 @@
 6. Требуется использовать идиоматичный для технологии стиль программирования.
 
 # Реализация
-Реализация основывается на типе array, встроенном в Erlang.
+Реализация основывается на типе `array`, встроенном в Erlang.
 
 ### Тип
 ```erlang
@@ -115,10 +115,68 @@ map(Set, Fun) ->
     fold(build_fold_map_fun(Fun), new(), Set).
 ```
 
-### Отображение
+### Сумма
+Множество структур является моноидом относительно этой операции.
+
 ```erlang
+fold_add_fun(Value, Acc) ->
+    add(Acc, Value).
+
+sum(Set1, Set2) ->
+    fold(fun fold_add_fun/2, fold(fun fold_add_fun/2, new(), Set1), Set2).
 ```
 
-### Отображение
+### Property-based testing
+Использовалась библиотека proper.
+
+#### Тестирование свойств моноида
 ```erlang
+prop_sum_associativity() ->
+    ?FORALL({List1, List2, List3}, {list(integer()), list(integer()), list(integer())},
+        case 1 of
+            2 ->
+                false;
+            _ ->
+                Set1 = oahs:from_list(List1),
+                Set2 = oahs:from_list(List2),
+                Set3 = oahs:from_list(List3),
+                oahs:equal(
+                    oahs:sum(Set1, oahs:sum(Set2, Set3)),
+                    oahs:sum(oahs:sum(Set1, Set2), Set3)
+                )
+        end
+    ).
+
+prop_sum_neutral() ->
+    ?FORALL(List, list(integer()),
+        case 1 of
+            2 ->
+                false;
+            _ ->
+                Set = oahs:from_list(List),
+                Neutral = oahs:new(),
+                oahs:equal(oahs:sum(Set, Neutral), Set) andalso
+                    oahs:equal(oahs:sum(Neutral, Set), Set)
+        end
+    ).
 ```
+
+#### Прочие property-based тесты
+```erlang
+prop_add() ->
+    ?FORALL({List, Value}, {list(integer()), integer()},
+        oahs:contains(oahs:add(oahs:from_list(List), Value), Value)
+    ).
+
+prop_remove() ->
+    ?FORALL({List, Value}, {list(integer()), integer()},
+        oahs:contains(oahs:remove(oahs:from_list(List), Value), Value) =:= false
+    ).
+```
+
+# Вывод
+Благодаря наличию стандартной структуры `array`, на которой элементарно строится хэш-таблица, реализовывать структуру было не сложно.
+
+Понравилось выводить из `fold` прочие операции.
+
+Очень удобно описывать property-based тесты, используя proper.
