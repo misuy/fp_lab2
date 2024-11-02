@@ -2,7 +2,6 @@
     {description, "open adress hash set"},
     {vsn, "0.1.0"},
     {registered, []},
-    {mod, {euler_app, []}},
     {applications, [
         kernel,
         stdlib
@@ -11,4 +10,4 @@
     {modules, []},
     {licenses, ["Apache-2.0"]},
     {links, []}
- ]}.
+]}.
