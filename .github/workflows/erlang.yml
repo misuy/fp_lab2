@@ -1,0 +1,27 @@
+name: erlang
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: erlang:27
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: lint
+        working-directory: ${{github.workspace}}
+        run: rebar3 lint
+
+      - name: compile
+        working-directory: ${{github.workspace}}
+        run: rebar3 compile
+
+      - name: test
+        working-directory: ${{github.workspace}}
+        run: rebar3 ct
